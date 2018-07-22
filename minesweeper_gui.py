@@ -5,7 +5,6 @@ Created on 21 Jul 2018
 '''
 import wx 
 from random import sample
-import minesweeper_logic
 from minesweeper_logic import MinesweeperLogic
 
 BOARD_WIDTH = 8
@@ -24,8 +23,19 @@ class MinesweeperGui(wx.Frame):
         self.bmp_tile_flag = wx.Bitmap(".\\images\\tile_flag.gif")
         self.bmp_tile_clicked = wx.Bitmap(".\\images\\tile_clicked.gif")
         self.bmp_tile_mine = wx.Bitmap(".\\images\\tile_mine.gif")
+        self.bmp_numbers = [wx.Bitmap(".\\images\\tile_clicked.gif"),
+                            wx.Bitmap(".\\images\\tile_1.gif"),
+                            wx.Bitmap(".\\images\\tile_2.gif"),
+                            wx.Bitmap(".\\images\\tile_3.gif"),
+                            wx.Bitmap(".\\images\\tile_4.gif"),
+                            wx.Bitmap(".\\images\\tile_5.gif"),
+                            wx.Bitmap(".\\images\\tile_6.gif"),
+                            wx.Bitmap(".\\images\\tile_7.gif"),
+                            wx.Bitmap(".\\images\\tile_8.gif")]
+        
+        
         self.InitGUI()
-        self.logic = MinesweeperLogic()
+        self.logic = MinesweeperLogic(BOARD_WIDTH, BOARD_WIDTH, 16)
         
     def InitGUI(self): 
         #Frame stuff
@@ -87,8 +97,14 @@ class MinesweeperGui(wx.Frame):
            
     def OnButton(self,e):    
         print("ID = {} or Coordinates: {},{}".format(e.Id, int(e.Id/BOARD_WIDTH) , e.Id % BOARD_HEIGHT))
-        e.EventObject.SetBitmapDisabled(self.bmp_tile_clicked)
-        e.EventObject.Disable()
+        result = self.logic.move(e.Id)
+        
+        if result == -1:
+            wx.MessageBox("MINE!!!")
+        
+        else:    
+            e.EventObject.SetBitmapDisabled(self.bmp_numbers[result])
+            e.EventObject.Disable()
    
     def OnRightClick(self,e):
         print("Right ID: {}".format(e.Id))
