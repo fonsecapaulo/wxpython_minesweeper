@@ -7,7 +7,7 @@ import wx
 from random import sample
 from minesweeper_logic import MinesweeperLogic
 
-BOARD_WIDTH = 8
+BOARD_WIDTH = 9
 BOARD_HEIGHT = BOARD_WIDTH
 
 class MinesweeperGui(wx.Frame):
@@ -19,11 +19,12 @@ class MinesweeperGui(wx.Frame):
         self.parent=parent
         self.title=title
         
-        self.bmp_tile_plain = wx.Bitmap(".\\images\\tile_plain.gif")
-        self.bmp_tile_flag = wx.Bitmap(".\\images\\tile_flag.gif")
-        self.bmp_tile_clicked = wx.Bitmap(".\\images\\tile_clicked.gif")
-        self.bmp_tile_mine = wx.Bitmap(".\\images\\tile_mine.gif")
-        self.bmp_numbers = [wx.Bitmap(".\\images\\tile_clicked.gif"),
+        self.bmpTilePlain = wx.Bitmap(".\\images\\tile_plain.gif")
+        self.bmpTileFlag = wx.Bitmap(".\\images\\tile_flag.gif")
+        self.bmpTileClicked = wx.Bitmap(".\\images\\tile_clicked.gif")
+        self.bmpTileMine = wx.Bitmap(".\\images\\tile_mine.gif")
+        self.bmpTileWrong = wx.Bitmap(".\\images\\tile_wrong.gif")
+        self.bmpNumbers = [wx.Bitmap(".\\images\\tile_clicked.gif"),
                             wx.Bitmap(".\\images\\tile_1.gif"),
                             wx.Bitmap(".\\images\\tile_2.gif"),
                             wx.Bitmap(".\\images\\tile_3.gif"),
@@ -35,7 +36,7 @@ class MinesweeperGui(wx.Frame):
         
         
         self.InitGUI()
-        self.logic = MinesweeperLogic(BOARD_WIDTH, BOARD_WIDTH, 16)
+        self.logic = MinesweeperLogic(BOARD_WIDTH, BOARD_WIDTH, 10)
         
     def InitGUI(self): 
         #Frame stuff
@@ -63,11 +64,13 @@ class MinesweeperGui(wx.Frame):
         self.panel = wx.Panel(self)
         ###################################       
         #Buttons
+        self.buttons=[]
         gs = wx.GridSizer(BOARD_WIDTH, BOARD_HEIGHT,0,0)
         for i in range(0, BOARD_HEIGHT*BOARD_WIDTH): 
-            bmpButton = wx.BitmapButton(self.panel, id = i, bitmap = self.bmp_tile_plain, )
+            bmpButton = wx.BitmapButton(self.panel, id = i, bitmap = self.bmpTilePlain, )
             #Bind left Right
             bmpButton.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
+            self.buttons.append(bmpButton)
             gs.Add(bmpButton, 0, wx.EXPAND)
         self.panel.SetSizer(gs)
         ###################################
@@ -86,39 +89,51 @@ class MinesweeperGui(wx.Frame):
         mines = sample(range(0, 63),16)
         for mine in mines:
             button = wx.Window.FindWindowById(mine, parent=None)
-            button.SetBitmapLabel(self.bmp_tile_mine)    
+            button.SetBitmapLabel(self.bmpTileMine)    
                
     def OnQuit(self, e):
         self.Close()
     
     def OnNewGame(self, e):
-        self.logic.test()
         pass
            
     def OnButton(self,e):    
         print("ID = {} or Coordinates: {},{}".format(e.Id, int(e.Id/BOARD_WIDTH) , e.Id % BOARD_HEIGHT))
-        result = self.logic.move(e.Id)
+        result = self.logic.Move(e.Id)
         
-        if result == -1:
-            wx.MessageBox("MINE!!!")
-        
+        if result['mine'] == True:
+            wx.MessageBox("MINE - Game Over")
+            e.EventObject.SetBitmapDisabled(self.bmpTileWrong)
+            self.NewGame()
+        	
         else:    
-            e.EventObject.SetBitmapDisabled(self.bmp_numbers[result])
+            e.EventObject.SetBitmapDisabled(self.bmpNumbers[result["tile_info"]])
             e.EventObject.Disable()
+            #To avoid focus going to the next button, set focus on frame
+            self.SetFocus()
+            
+            #TODO: Propagate 0s
+            #if result["tile_info"] == 0:
+            
+            if result['finish'] == True:
+                wx.MessageBox("FINISH!!!")
+                self.NewGame()
    
     def OnRightClick(self,e):
-        print("Right ID: {}".format(e.Id))
-        if self.bmp_tile_plain.Handle == e.EventObject.GetBitmapLabel().Handle:
-            e.EventObject.SetBitmapLabel(self.bmp_tile_flag)
+        #print("Right ID: {}".format(e.Id))
+        if self.bmpTilePlain.Handle == e.EventObject.GetBitmapLabel().Handle:
+            e.EventObject.SetBitmapLabel(self.bmpTileFlag)
         else:
-            e.EventObject.SetBitmapLabel(self.bmp_tile_plain)    
+            e.EventObject.SetBitmapLabel(self.bmpTilePlain)    
     
     
     ################Aux methods#####################
-    def ChangeButton(self):    
-        button = wx.Window.FindWindowById(3, parent=None)
-        button.SetBitmapLabel(self.bmp_tile_flag)
-
+    def NewGame(self):
+    	for i in self.buttons:
+    		i.SetBitmap(self.bmpTilePlain)
+    		i.Enable()
+    	self.logic.new_game(BOARD_WIDTH, BOARD_WIDTH, 10)
+    	
 if __name__ == '__main__':
     
     app = wx.App()
