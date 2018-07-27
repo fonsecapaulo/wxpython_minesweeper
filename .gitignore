@@ -1,3 +1,9 @@
+#Eclipse
 .project
 .pydevproject
+
+#Python
 __pycache__
+
+#Pytest
+.pytest*
