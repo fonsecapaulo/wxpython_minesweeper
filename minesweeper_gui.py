@@ -7,6 +7,7 @@ import wx
 from random import sample
 from minesweeper_logic import MinesweeperLogic
 
+NUMBER_MINES = 10
 BOARD_WIDTH = 9
 BOARD_HEIGHT = BOARD_WIDTH
 
@@ -19,30 +20,34 @@ class MinesweeperGui(wx.Frame):
 		self.parent=parent
 		self.title=title
 		
-		self.bmpTilePlain = wx.Bitmap(".\\images\\tile_plain.gif")
-		self.bmpTileFlag = wx.Bitmap(".\\images\\tile_flag.gif")
-		self.bmpTileClicked = wx.Bitmap(".\\images\\tile_clicked.gif")
-		self.bmpTileMine = wx.Bitmap(".\\images\\tile_mine.gif")
-		self.bmpTileWrong = wx.Bitmap(".\\images\\tile_wrong.gif")
-		self.bmpNumbers = [wx.Bitmap(".\\images\\tile_clicked.gif"),
-							wx.Bitmap(".\\images\\tile_1.gif"),
-							wx.Bitmap(".\\images\\tile_2.gif"),
-							wx.Bitmap(".\\images\\tile_3.gif"),
-							wx.Bitmap(".\\images\\tile_4.gif"),
-							wx.Bitmap(".\\images\\tile_5.gif"),
-							wx.Bitmap(".\\images\\tile_6.gif"),
-							wx.Bitmap(".\\images\\tile_7.gif"),
-							wx.Bitmap(".\\images\\tile_8.gif")]
+		self.bmpTilePlain = wx.Bitmap("./images/tile_plain.gif")
+		self.bmpTileFlag = wx.Bitmap("./images/tile_flag.gif")
+		self.bmpTileClicked = wx.Bitmap("./images/tile_clicked.gif")
+		self.bmpTileMine = wx.Bitmap("./images/tile_mine.gif")
+		self.bmpTileWrong = wx.Bitmap("./images/tile_wrong.gif")
+		self.bmpNumbers = [wx.Bitmap("./images/tile_clicked.gif"),
+							wx.Bitmap("./images/tile_1.gif"),
+							wx.Bitmap("./images/tile_2.gif"),
+							wx.Bitmap("./images/tile_3.gif"),
+							wx.Bitmap("./images/tile_4.gif"),
+							wx.Bitmap("./images/tile_5.gif"),
+							wx.Bitmap("./images/tile_6.gif"),
+							wx.Bitmap("./images/tile_7.gif"),
+							wx.Bitmap("./images/tile_8.gif")]
 		
 		
 		self.InitGUI()
-		self.logic = MinesweeperLogic(BOARD_WIDTH, BOARD_WIDTH, 10)
+		self.logic = MinesweeperLogic(BOARD_WIDTH, BOARD_WIDTH, NUMBER_MINES)
 		
 	def InitGUI(self): 
 		#Frame stuff
 		self.SetSize((300, 300))
 		self.SetTitle(self.title)
 		self.Centre()
+		
+		icon = wx.Icon()
+		icon.CopyFromBitmap(wx.Bitmap(".\images\icon.png", wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
 		
 		#####################################
 		#Create the menu bar
@@ -57,7 +62,6 @@ class MinesweeperGui(wx.Frame):
 		menubar.Append(fileMenu, '&File')
 		###
 		self.SetMenuBar(menubar)
-		
 		###################################
 		#Create Panel
 		self.panel = wx.Panel(self)
@@ -78,6 +82,7 @@ class MinesweeperGui(wx.Frame):
 		###Menu Actions
 		self.Bind(wx.EVT_MENU, self.OnQuit, fileQuitItem)
 		self.Bind(wx.EVT_MENU, self.OnNewGame, fileNewGame)
+		
 		###General Button
 		self.Bind(wx.EVT_BUTTON, self.OnButton)
  
@@ -94,8 +99,11 @@ class MinesweeperGui(wx.Frame):
 		result = self.logic.ClickMove(e.Id)
 		
 		if result['mine'] == True:
-			wx.MessageBox("MINE - Game Over")
-			e.EventObject.SetBitmapDisabled(self.bmpTileWrong)
+			for mine in self.logic.ShowMines():
+				button = wx.Window.FindWindowById(mine)
+				button.SetBitmap(self.bmpTileMine)
+			e.EventObject.SetBitmap(self.bmpTileWrong)
+			wx.MessageBox("BOOOOMMM - You found a mine!", "GAME OVER", wx.ICON_ERROR)
 			self.NewGame()
 			
 		else:	
@@ -109,7 +117,7 @@ class MinesweeperGui(wx.Frame):
 			self.SetFocus()
 			
 			if result['finish'] == True:
-				wx.MessageBox("FINISH!!!")
+				wx.MessageBox("Congratulations You Won!", "Congratulations")
 				self.NewGame()
    
 	def OnRightClick(self,e):
@@ -121,19 +129,20 @@ class MinesweeperGui(wx.Frame):
 			e.EventObject.SetBitmapLabel(self.bmpTileFlag)
 		else:
 			e.EventObject.SetBitmapLabel(self.bmpTilePlain)	
-	
-	
+		
 	################Aux methods#####################
 	def NewGame(self):
+		#Clear BTM and Enable all buttons
 		for i in self.buttons:
 			i.SetBitmap(self.bmpTilePlain)
 			i.Enable()
-		self.logic.NewGame(BOARD_WIDTH, BOARD_WIDTH, 10)
+		self.logic.NewGame(BOARD_WIDTH, BOARD_WIDTH, NUMBER_MINES)
+	
 		
 if __name__ == '__main__':
 	
 	app = wx.App()
-	ex = MinesweeperGui(None, title='wxPython Minesweeper')
+	ex = MinesweeperGui(None, title=' Minesweeper')
 	ex.Show()
 	app.MainLoop()
 	

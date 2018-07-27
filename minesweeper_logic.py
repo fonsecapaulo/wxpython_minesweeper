@@ -7,9 +7,7 @@ from random import sample
 import pprint
 
 class MinesweeperLogic(object):
-	'''
-	classdocs
-	'''
+	"""classdocs"""
 
 	def __init__(self, rowSize, columnSize, numberMines):
 		'''
@@ -26,13 +24,12 @@ class MinesweeperLogic(object):
 			mineCoordinates.append(self.IntToCoordinates(mine))
 			
 		#print(mineCoordinates)
-		return (mineCoordinates)
+		return ((mines, mineCoordinates))
 			
 	def GenerateGameMatrix(self, mines):
 		
 		matrix = [[Cell() for _ in range(self.rowSize)] for _ in range(self.columnSize)]
-		#pprint.pprint(matrix)
-		
+				
 		for mine in mines:
 			mineRow, mineColumn = (mine)
 			matrix[mineRow][mineColumn].value = -1
@@ -45,8 +42,7 @@ class MinesweeperLogic(object):
 					if ( 0 <= i < self.rowSize and 0 <= j < self.columnSize and matrix[i][j].value!= -1):
 						matrix[i][j].value+=1
 		
-		#aux_matrix = [[matrix[p][o].value for o in range(self.rowSize)] for p in range(self.columnSize)]
-		#pprint.pprint(aux_matrix)
+		#self.PrintGameMatrix(matrix)
 		
 		return matrix
 	
@@ -57,8 +53,8 @@ class MinesweeperLogic(object):
 		
 		self.numberMoves = self.rowSize * self.columnSize
 		
-		self.mine_locations = self.GenerateMines()
-		self.gameMatrix = self.GenerateGameMatrix(self.mine_locations)
+		self.minesInt, self.minesLocations = self.GenerateMines()
+		self.gameMatrix = self.GenerateGameMatrix(self.minesLocations)
 	
 	def ClickMove(self, buttonNumber):
 		result={
@@ -118,17 +114,23 @@ class MinesweeperLogic(object):
 				for j in columnRange:
 					#Inside row boundaries and Column boundaries and not flagged cell and not the initial cell (row column)
 					if ( 0 <= i < self.rowSize and 0 <= j < self.columnSize and self.gameMatrix[i][j].flag == False and self.gameMatrix[i][j].clicked == False and not (i==row and j==column)):
-						if (i,j) in propagateList:
-							continue
-						else:
-							propagateList.append((i,j))
-												
-						if (self.gameMatrix[i][j].value == 0):
-							FloodFill(i, j)	
+ 						if (i,j) in propagateList:
+ 							continue
+ 						else:
+ 							propagateList.append((i,j))
+ 							if (self.gameMatrix[i][j].value == 0):
+							 	FloodFill(i, j)	
 		FloodFill(row, column)
 		
 		return propagateList
-
+	
+	def ShowMines(self):
+		return self.minesInt
+	
+	def PrintGameMatrix(self, matrix):
+		aux_matrix = [[matrix[p][o].value for o in range(self.rowSize)] for p in range(self.columnSize)]
+		pprint.pprint(aux_matrix,indent=4)
+	
 class Cell():
 	
 	def __init__(self):
