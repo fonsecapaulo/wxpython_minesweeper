@@ -6,4 +6,5 @@ Fully functional.
 To Do:
 - Timing information
 - Different Board Sizes and Mine Numbers via configuration dialog.
+
 	
