@@ -4,18 +4,17 @@ Created on 21 Jul 2018
 @author: Paulo
 '''
 import wx 
-from random import sample
 from minesweeper_logic import MinesweeperLogic
 
-NUMBER_MINES = 10
-BOARD_WIDTH = 9
-BOARD_HEIGHT = BOARD_WIDTH
+NUMBER_MINES = 10			#10		#40		#99
+NUMBER_COLUMNS = 9 			#9		#16		#30
+NUMBER_ROWS = 9				#9		#16		#16
 
 class MinesweeperGui(wx.Frame):
 	
 	def __init__(self, parent, title):
 		#calls wx.Frame constructor
-		super(MinesweeperGui, self).__init__(parent, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+		super(MinesweeperGui, self).__init__(parent, style=wx.DEFAULT_FRAME_STYLE )#^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
 		
 		self.parent=parent
 		self.title=title
@@ -37,7 +36,7 @@ class MinesweeperGui(wx.Frame):
 		
 		
 		self.InitGUI()
-		self.logic = MinesweeperLogic(BOARD_WIDTH, BOARD_WIDTH, NUMBER_MINES)
+		self.logic = MinesweeperLogic(NUMBER_ROWS, NUMBER_COLUMNS, NUMBER_MINES)
 		
 	def InitGUI(self): 
 		#Frame stuff
@@ -68,8 +67,8 @@ class MinesweeperGui(wx.Frame):
 		###################################	   
 		#Buttons
 		self.buttons=[]
-		gs = wx.GridSizer(BOARD_WIDTH, BOARD_HEIGHT,0,0)
-		for i in range(0, BOARD_HEIGHT*BOARD_WIDTH): 
+		gs = wx.GridSizer(NUMBER_ROWS, NUMBER_COLUMNS,0,0)
+		for i in range(0, NUMBER_ROWS*NUMBER_COLUMNS): 
 			bmpButton = wx.BitmapButton(self.panel, id = i, bitmap = self.bmpTilePlain, )
 			#Bind left Right
 			bmpButton.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
@@ -85,17 +84,17 @@ class MinesweeperGui(wx.Frame):
 		
 		###General Button
 		self.Bind(wx.EVT_BUTTON, self.OnButton)
- 
+
 		###################################
-   
+
 	def OnQuit(self, e):
 		self.Close()
 	
 	def OnNewGame(self, e):
 		self.NewGame()
-		   
+
 	def OnButton(self,e):	
-		#print("ID = {} or Coordinates: {},{}".format(e.Id, int(e.Id/BOARD_WIDTH) , e.Id % BOARD_HEIGHT))
+		#print("ID = {} or Coordinates: {},{}".format(e.Id, int(e.Id/NUMBER_COLUMNS) , e.Id % NUMBER_COLUMNS))
 		result = self.logic.ClickMove(e.Id)
 		
 		if result['mine'] == True:
@@ -108,8 +107,8 @@ class MinesweeperGui(wx.Frame):
 			
 		else:	
 			for cell in result["tile_info"]:
-				id, value = cell
-				button = wx.Window.FindWindowById(id)
+				cell_id, value = cell
+				button = wx.Window.FindWindowById(cell_id)
 				button.SetBitmapDisabled(self.bmpNumbers[value])
 				button.Disable()
 			
@@ -119,7 +118,7 @@ class MinesweeperGui(wx.Frame):
 			if result['finish'] == True:
 				wx.MessageBox("Congratulations You Won!", "Congratulations")
 				self.NewGame()
-   
+
 	def OnRightClick(self,e):
 		#print("Right ID: {}".format(e.Id))
 		
@@ -136,7 +135,7 @@ class MinesweeperGui(wx.Frame):
 		for i in self.buttons:
 			i.SetBitmap(self.bmpTilePlain)
 			i.Enable()
-		self.logic.NewGame(BOARD_WIDTH, BOARD_WIDTH, NUMBER_MINES)
+		self.logic.NewGame(NUMBER_ROWS, NUMBER_COLUMNS, NUMBER_MINES)
 	
 		
 if __name__ == '__main__':

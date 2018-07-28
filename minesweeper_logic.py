@@ -18,17 +18,18 @@ class MinesweeperLogic(object):
 	def GenerateMines(self):
 		mineCoordinates=[]
 		mines = sample(range(0, (self.columnSize*self.rowSize)-1) , self.numberMines)
-		#print (mines)
+		
+		print (mines)
 		
 		for mine in mines:
 			mineCoordinates.append(self.IntToCoordinates(mine))
 			
-		#print(mineCoordinates)
+		print(mineCoordinates)
 		return ((mines, mineCoordinates))
 			
 	def GenerateGameMatrix(self, mines):
 		
-		matrix = [[Cell() for _ in range(self.rowSize)] for _ in range(self.columnSize)]
+		matrix = [[Cell() for _ in range(self.columnSize)] for _ in range(self.rowSize)]
 				
 		for mine in mines:
 			mineRow, mineColumn = (mine)
@@ -42,7 +43,7 @@ class MinesweeperLogic(object):
 					if ( 0 <= i < self.rowSize and 0 <= j < self.columnSize and matrix[i][j].value!= -1):
 						matrix[i][j].value+=1
 		
-		#self.PrintGameMatrix(matrix)
+		self.PrintGameMatrix(matrix)
 		
 		return matrix
 	
@@ -97,7 +98,7 @@ class MinesweeperLogic(object):
 		self.gameMatrix[row][column].ToggleFlag()
 	
 	def IntToCoordinates(self, i):
-		row = int(i / self.rowSize)
+		row = int(i / self.columnSize)
 		column = i % self.columnSize
 		return (row, column)
 	
@@ -114,12 +115,12 @@ class MinesweeperLogic(object):
 				for j in columnRange:
 					#Inside row boundaries and Column boundaries and not flagged cell and not the initial cell (row column)
 					if ( 0 <= i < self.rowSize and 0 <= j < self.columnSize and self.gameMatrix[i][j].flag == False and self.gameMatrix[i][j].clicked == False and not (i==row and j==column)):
- 						if (i,j) in propagateList:
- 							continue
- 						else:
- 							propagateList.append((i,j))
- 							if (self.gameMatrix[i][j].value == 0):
-							 	FloodFill(i, j)	
+						if (i,j) in propagateList:
+							continue
+						else:
+							propagateList.append((i,j))
+							if (self.gameMatrix[i][j].value == 0):
+								FloodFill(i, j)	
 		FloodFill(row, column)
 		
 		return propagateList
@@ -128,8 +129,8 @@ class MinesweeperLogic(object):
 		return self.minesInt
 	
 	def PrintGameMatrix(self, matrix):
-		aux_matrix = [[matrix[p][o].value for o in range(self.rowSize)] for p in range(self.columnSize)]
-		pprint.pprint(aux_matrix,indent=4)
+		aux_matrix = [[matrix[p][o].value for o in range(self.columnSize)] for p in range(self.rowSize)]
+		pprint.pprint(aux_matrix, indent=4, width=200)
 	
 class Cell():
 	
