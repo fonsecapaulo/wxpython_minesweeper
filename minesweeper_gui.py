@@ -14,7 +14,7 @@ class MinesweeperGui(wx.Frame):
 	
 	def __init__(self, parent, title):
 		#calls wx.Frame constructor
-		super(MinesweeperGui, self).__init__(parent, style=wx.DEFAULT_FRAME_STYLE )#^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+		super(MinesweeperGui, self).__init__(parent, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
 		
 		self.parent=parent
 		self.title=title
