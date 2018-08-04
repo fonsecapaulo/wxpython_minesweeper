@@ -19,12 +19,12 @@ class MinesweeperLogic(object):
 		mineCoordinates=[]
 		mines = sample(range(0, (self.columnSize*self.rowSize)-1) , self.numberMines)
 		
-		print (mines)
+		#print (mines)
 		
 		for mine in mines:
 			mineCoordinates.append(self.IntToCoordinates(mine))
 			
-		print(mineCoordinates)
+		#print(mineCoordinates)
 		return ((mines, mineCoordinates))
 			
 	def GenerateGameMatrix(self, mines):
@@ -43,7 +43,7 @@ class MinesweeperLogic(object):
 					if ( 0 <= i < self.rowSize and 0 <= j < self.columnSize and matrix[i][j].value!= -1):
 						matrix[i][j].value+=1
 		
-		self.PrintGameMatrix(matrix)
+		#self.PrintGameMatrix(matrix)
 		
 		return matrix
 	
@@ -98,6 +98,8 @@ class MinesweeperLogic(object):
 		self.gameMatrix[row][column].ToggleFlag()
 	
 	def IntToCoordinates(self, i):
+		if i < 0 :
+			raise ValueError
 		row = int(i / self.columnSize)
 		column = i % self.columnSize
 		return (row, column)

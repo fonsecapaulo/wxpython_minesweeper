@@ -4,7 +4,7 @@ Created on 21 Jul 2018
 @author: Paulo
 '''
 import wx 
-from minesweeper_logic import MinesweeperLogic
+from minesweeper.minesweeper_logic import MinesweeperLogic
 
 class MinesweeperGui(wx.Frame):
     
@@ -106,7 +106,7 @@ class MinesweeperGui(wx.Frame):
         self.NewGame()
 
     def OnButton(self,e):    
-        print("ID = {} or Coordinates: {},{}".format(e.Id, int(e.Id/ self.gameSettings[self.gameSettingsPointer]['numberColumns']) , e.Id % self.gameSettings[self.gameSettingsPointer]['numberColumns'] ))
+        #print("ID = {} or Coordinates: {},{}".format(e.Id, int(e.Id/ self.gameSettings[self.gameSettingsPointer]['numberColumns']) , e.Id % self.gameSettings[self.gameSettingsPointer]['numberColumns'] ))
         result = self.logic.ClickMove(e.Id)
         
         if result['mine'] == True:
@@ -147,7 +147,7 @@ class MinesweeperGui(wx.Frame):
                                   settings = self.gameSettings )
         res = settingsDialog.ShowModal()
         if res == wx.ID_OK:
-            print ("Setting: {}".format(settingsDialog.GetSettings()))
+            #print ("Setting: {}".format(settingsDialog.GetSettings()))
             self.gameSettingsPointer=settingsDialog.GetSettings()
         settingsDialog.Destroy()
             
