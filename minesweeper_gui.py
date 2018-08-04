@@ -142,7 +142,9 @@ class MinesweeperGui(wx.Frame):
             e.EventObject.SetBitmapLabel(self.bmpTilePlain)    
     
     def OnSettings(self, e):
-        settingsDialog = Settings(self)
+        settingsDialog = Settings(self, 
+                                  pointer = self.gameSettingsPointer,
+                                  settings = self.gameSettings )
         res = settingsDialog.ShowModal()
         if res == wx.ID_OK:
             print ("Setting: {}".format(settingsDialog.GetSettings()))
@@ -159,9 +161,6 @@ class MinesweeperGui(wx.Frame):
             # Calling Destroy removes widget from parent and sizer
             button.Destroy()
             numberButtons -= 1
-            self.panel.Layout()
-            self.Fit()
-           
         self.buttons.clear()
         
         #resize gs
@@ -193,18 +192,29 @@ class MinesweeperGui(wx.Frame):
             
 class Settings(wx.Dialog):
     def __init__(self, *args, **kwargs):
-        wx.Dialog.__init__(self, *args, **kwargs)
+        wx.Dialog.__init__(self, *args)
         
         self.panel = wx.Panel(self)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         
-        self.rb1 = wx.RadioButton(self.panel, -1, label='Easy: 9 x 9 with 10 mines', style = wx.RB_GROUP) 
-        self.rb2 = wx.RadioButton(self.panel, -1, label='Medium: 16 x 16 with 40 mines') 
-        self.rb3 = wx.RadioButton(self.panel, -1, label='Hard: 16 x 30 with 99 mines')
-        
-        self.sizer.Add(self.rb1)
-        self.sizer.Add(self.rb2)
-        self.sizer.Add(self.rb3)
+        self.radioButtons=[]
+        for i in range(4):
+            rb = None
+            
+            if i==0:
+                rb = wx.RadioButton(self.panel, -1, label='Easy: 9 x 9 with 10 mines', style = wx.RB_GROUP)
+            elif i==1:
+                rb = wx.RadioButton(self.panel, -1, label='Medium: 16 x 16 with 40 mines')
+            elif i==2:
+                rb = wx.RadioButton(self.panel, -1, label='Hard: 16 x 30 with 99 mines')
+            else:
+                #TODO: fix this for custom
+                rb = wx.RadioButton(self.panel, -1, label='Custom')             
+            
+            self.sizer.Add(rb)
+            self.radioButtons.append(rb)
+                
+        self.radioButtons[kwargs['pointer']].SetValue(True)
         
         self.buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
         
@@ -224,16 +234,18 @@ class Settings(wx.Dialog):
         self.EndModal(wx.ID_CANCEL)
 
     def onOk(self, e):
-        #TODO read current setting
         self.EndModal(wx.ID_OK)
 
     def GetSettings(self):
-        if self.rb1.GetValue() == True:
-            return 0
-        elif self.rb2.GetValue() == True:
-            return 1
-        else:
-            return 2
+        i=0
+        for rButton in self.radioButtons:
+            if rButton.GetValue() == True:
+                #FIXME: remove this
+                if i==3:
+                    return 2
+                
+                return i
+            i+=1
     
         
 if __name__ == '__main__':
