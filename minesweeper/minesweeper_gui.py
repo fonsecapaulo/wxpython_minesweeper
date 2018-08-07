@@ -29,11 +29,14 @@ class MinesweeperGui(wx.Frame):
                             wx.Bitmap("./images/tile_7.gif"),
                             wx.Bitmap("./images/tile_8.gif")]
         
+        self.TILE_SIZE = 28
+        self.MENU_HEIGHT = 60
+        
         self.gameSettings=[
-                            { 'numberRows': 9, 'numberColumns': 9, 'numberMines': 10, 'windowWidth': 300, 'windowHeight': 300 },
-                            { 'numberRows': 16, 'numberColumns': 16, 'numberMines': 40, 'windowWidth': 500, 'windowHeight': 450 },
-                            { 'numberRows': 16, 'numberColumns': 30, 'numberMines': 99, 'windowWidth': 950, 'windowHeight': 450 },
-                            { 'numberRows': 0, 'numberColumns': 0, 'numberMines': 0, 'windowWidth': 0, 'windowHeight': 0 }
+                            { 'numberRows': 9, 'numberColumns': 9, 'numberMines': 10 },
+                            { 'numberRows': 16, 'numberColumns': 16, 'numberMines': 40 },
+                            { 'numberRows': 16, 'numberColumns': 30, 'numberMines': 99 },
+                            { 'numberRows': 0, 'numberColumns': 0, 'numberMines': 0 }
                          ]
         #pointer for the gameSettings
         self.gameSettingsPointer = 0
@@ -46,8 +49,9 @@ class MinesweeperGui(wx.Frame):
     def InitGUI(self): 
                 
         #Frame stuff
-        self.SetSize((self.gameSettings[self.gameSettingsPointer]['windowWidth'], 
-                      self.gameSettings[self.gameSettingsPointer]['windowHeight'])) 
+        
+        self.SetSize((self.gameSettings[self.gameSettingsPointer]['numberColumns'] * self.TILE_SIZE , 
+                      self.gameSettings[self.gameSettingsPointer]['numberRows'] * self.TILE_SIZE  + self.MENU_HEIGHT)) 
         self.SetTitle(self.title)
         self.Centre()
                 
@@ -142,11 +146,18 @@ class MinesweeperGui(wx.Frame):
             e.EventObject.SetBitmapLabel(self.bmpTilePlain)    
     
     def OnSettings(self, e):
-        settingsDialog = Settings(parent = self, pointer = self.gameSettingsPointer)
+        settingsDialog = Settings(parent = self, pointer = self.gameSettingsPointer, settings = self.gameSettings)
         res = settingsDialog.ShowModal()
+        
         if res == wx.ID_OK:
-            #print ("Setting: {}".format(settingsDialog.GetSettings()))
-            self.gameSettingsPointer=settingsDialog.GetSettings()
+            index, rows, columns , mines = settingsDialog.GetSettings()
+            self.gameSettingsPointer = index 
+            #custom
+            if index == 3:
+                self.gameSettings[3]['numberRows'] = rows 
+                self.gameSettings[3]['numberColumns'] = columns 
+                self.gameSettings[3]['numberMines'] = mines
+                     
         settingsDialog.Destroy()
             
 ################Aux methods#####################
@@ -174,8 +185,8 @@ class MinesweeperGui(wx.Frame):
             self.buttons.append(bmpButton)
             self.gs.Add(bmpButton, 0, wx.EXPAND)
         
-        self.SetSize((self.gameSettings[self.gameSettingsPointer]['windowWidth'], 
-                      self.gameSettings[self.gameSettingsPointer]['windowHeight']))
+        self.SetSize((self.gameSettings[self.gameSettingsPointer]['numberColumns'] * self.TILE_SIZE , 
+                      self.gameSettings[self.gameSettingsPointer]['numberRows'] * self.TILE_SIZE ))
         
         self.panel.SetSizer(self.gs)
         self.panel.Layout()
@@ -188,7 +199,7 @@ class MinesweeperGui(wx.Frame):
                             )
             
 class Settings(wx.Dialog):
-    def __init__(self, parent, pointer):
+    def __init__(self, parent, pointer, settings):
         super().__init__(parent)
         
         self.SetSize((350,200))
@@ -218,23 +229,23 @@ class Settings(wx.Dialog):
                 rb = wx.RadioButton(self.panel, 3, label='Custom:')
                 sz.Add(rb)
                 
-                self.inputTxtOne = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
-                sz.Add(self.inputTxtOne ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
-                self.inputTxtOne.Enable(False)
+                self.inputRows = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
+                sz.Add(self.inputRows ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                self.inputRows.Enable(False)
                 
                 labelOne = wx.StaticText(self.panel, wx.ID_ANY, 'x')             
                 sz.Add(labelOne ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
                 
-                self.inputTxtTwo = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
-                sz.Add(self.inputTxtTwo ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
-                self.inputTxtTwo.Enable(False)
+                self.inputColumns = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
+                sz.Add(self.inputColumns ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                self.inputColumns.Enable(False)
                 
                 labelTwo = wx.StaticText(self.panel, wx.ID_ANY, 'with')             
                 sz.Add(labelTwo ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
                 
-                self.inputTxtThree = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
-                sz.Add(self.inputTxtThree ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
-                self.inputTxtThree.Enable(False)
+                self.inputMines = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
+                sz.Add(self.inputMines ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                self.inputMines.Enable(False)
                 
                 labelThree = wx.StaticText(self.panel, wx.ID_ANY, 'mines')             
                 sz.Add(labelThree ,proportion = 0, flag = wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
@@ -247,9 +258,12 @@ class Settings(wx.Dialog):
             
         self.radioButtons[pointer].SetValue(True)
         
-        # In case of custom settings, enable the text boxes
+        # TODO: pass the settings 
         if pointer == 3:
-            self.inputTxtOne.Enable(True); self.inputTxtTwo.Enable(True); self.inputTxtThree.Enable(True);
+            self.inputRows.Enable(True); self.inputColumns.Enable(True); self.inputMines.Enable(True);
+            self.inputRows.SetValue(str(settings[pointer]['numberRows']))
+            self.inputColumns.SetValue(str(settings[pointer]['numberColumns']))
+            self.inputMines.SetValue(str(settings[pointer]['numberMines']))
         
         self.buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
         
@@ -273,19 +287,17 @@ class Settings(wx.Dialog):
 
     def onRadioButton(self, e):
         if e.Id == 3:
-            self.inputTxtOne.Enable(True); self.inputTxtTwo.Enable(True); self.inputTxtThree.Enable(True);
+            self.inputRows.Enable(True); self.inputColumns.Enable(True); self.inputMines.Enable(True);
         else:
-            self.inputTxtOne.Enable(False); self.inputTxtTwo.Enable(False); self.inputTxtThree.Enable(False);    
+            self.inputRows.Enable(False); self.inputColumns.Enable(False); self.inputMines.Enable(False);    
 
     def GetSettings(self):
         i=0
         for rButton in self.radioButtons:
             if rButton.GetValue() == True:
-                #FIXME: remove this
                 if i==3:
-                    return 2
-                
-                return i
+                    return (i, int(self.inputRows.GetValue()), int(self.inputColumns.GetValue()), int(self.inputMines.GetValue()))
+                return (i, 0, 0, 0)
             i+=1
     
         
