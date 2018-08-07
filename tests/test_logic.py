@@ -9,13 +9,13 @@ from minesweeper.minesweeper_logic import MinesweeperLogic
 
 
 def test_IntToCoordinates():
-    logic = MinesweeperLogic(9,9,10)
+    logic = MinesweeperLogic(16,30,99)
     
-    assert logic.IntToCoordinates(9)==(1,0)
+    assert logic.IntToCoordinates(30)==(1,0)
     with pytest.raises(ValueError):
-        logic.IntToCoordinates(-9)
+        logic.IntToCoordinates(-30)
 
 def test_CoordinatesToInt():
-    logic = MinesweeperLogic(9,9,10)
+    logic = MinesweeperLogic(16,30,99)
     
-    assert logic.CoordinatesToInt(1,0)==9
+    assert logic.CoordinatesToInt(1,0)==30

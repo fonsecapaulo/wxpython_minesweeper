@@ -4,7 +4,7 @@ Created on 21 Jul 2018
 @author: Paulo
 '''
 import wx 
-from minesweeper.minesweeper_logic import MinesweeperLogic
+from minesweeper_logic import MinesweeperLogic
 
 class MinesweeperGui(wx.Frame):
     
@@ -142,16 +142,15 @@ class MinesweeperGui(wx.Frame):
             e.EventObject.SetBitmapLabel(self.bmpTilePlain)    
     
     def OnSettings(self, e):
-        settingsDialog = Settings(self, 
-                                  pointer = self.gameSettingsPointer,
-                                  settings = self.gameSettings )
+        settingsDialog = Settings(parent = self, pointer = self.gameSettingsPointer)
         res = settingsDialog.ShowModal()
         if res == wx.ID_OK:
             #print ("Setting: {}".format(settingsDialog.GetSettings()))
             self.gameSettingsPointer=settingsDialog.GetSettings()
         settingsDialog.Destroy()
             
-    ################Aux methods#####################
+################Aux methods#####################
+
     def NewGame(self):
         
         #remove all buttons
@@ -187,14 +186,18 @@ class MinesweeperGui(wx.Frame):
                             self.gameSettings[self.gameSettingsPointer]['numberColumns'], 
                             self.gameSettings[self.gameSettingsPointer]['numberMines']
                             )
-   
-        
             
 class Settings(wx.Dialog):
-    def __init__(self, *args, **kwargs):
-        wx.Dialog.__init__(self, *args)
+    def __init__(self, parent, pointer):
+        super().__init__(parent)
         
-        self.panel = wx.Panel(self)
+        self.SetSize((350,200))
+        self.SetTitle("Minesweeper Settings")
+        icon = wx.Icon()
+        icon.CopyFromBitmap(wx.Bitmap(".\images\icon.png", wx.BITMAP_TYPE_ANY))
+        self.SetIcon(icon)
+        
+        self.panel = wx.Panel(self, wx.ID_ANY)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         
         self.radioButtons=[]
@@ -202,19 +205,51 @@ class Settings(wx.Dialog):
             rb = None
             
             if i==0:
-                rb = wx.RadioButton(self.panel, -1, label='Easy: 9 x 9 with 10 mines', style = wx.RB_GROUP)
+                rb = wx.RadioButton(self.panel, 0, label='Easy: 9 x 9 with 10 mines', style = wx.RB_GROUP)
+                sz = rb
             elif i==1:
-                rb = wx.RadioButton(self.panel, -1, label='Medium: 16 x 16 with 40 mines')
+                rb = wx.RadioButton(self.panel, 1, label='Medium: 16 x 16 with 40 mines')
+                sz = rb
             elif i==2:
-                rb = wx.RadioButton(self.panel, -1, label='Hard: 16 x 30 with 99 mines')
+                rb = wx.RadioButton(self.panel, 2, label='Hard: 16 x 30 with 99 mines')
+                sz = rb
             else:
-                #TODO: fix this for custom
-                rb = wx.RadioButton(self.panel, -1, label='Custom')             
-            
-            self.sizer.Add(rb)
-            self.radioButtons.append(rb)
+                sz = wx.BoxSizer(wx.HORIZONTAL)
+                rb = wx.RadioButton(self.panel, 3, label='Custom:')
+                sz.Add(rb)
                 
-        self.radioButtons[kwargs['pointer']].SetValue(True)
+                self.inputTxtOne = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
+                sz.Add(self.inputTxtOne ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                self.inputTxtOne.Enable(False)
+                
+                labelOne = wx.StaticText(self.panel, wx.ID_ANY, 'x')             
+                sz.Add(labelOne ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                
+                self.inputTxtTwo = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
+                sz.Add(self.inputTxtTwo ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                self.inputTxtTwo.Enable(False)
+                
+                labelTwo = wx.StaticText(self.panel, wx.ID_ANY, 'with')             
+                sz.Add(labelTwo ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                
+                self.inputTxtThree = wx.TextCtrl(self.panel, wx.ID_ANY, '', size=(40,-1))
+                sz.Add(self.inputTxtThree ,proportion = 0, flag = wx.RIGHT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                self.inputTxtThree.Enable(False)
+                
+                labelThree = wx.StaticText(self.panel, wx.ID_ANY, 'mines')             
+                sz.Add(labelThree ,proportion = 0, flag = wx.LEFT | wx.ALIGN_CENTER_VERTICAL, border = 2)
+                
+                
+            self.sizer.Add(sz, proportion = 0, flag = wx.ALL, border = 6)
+            self.radioButtons.append(rb)
+        
+        self.Bind(wx.EVT_RADIOBUTTON, self.onRadioButton)
+            
+        self.radioButtons[pointer].SetValue(True)
+        
+        # In case of custom settings, enable the text boxes
+        if pointer == 3:
+            self.inputTxtOne.Enable(True); self.inputTxtTwo.Enable(True); self.inputTxtThree.Enable(True);
         
         self.buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
         
@@ -223,8 +258,8 @@ class Settings(wx.Dialog):
         self.button_ok.Bind(wx.EVT_BUTTON, self.onOk)
         self.button_cancel.Bind(wx.EVT_BUTTON, self.onCancel)
                
-        self.buttonSizer.Add(self.button_ok)
-        self.buttonSizer.Add(self.button_cancel)
+        self.buttonSizer.Add(self.button_ok, proportion = 0, flag = wx.ALL, border = 5)
+        self.buttonSizer.Add(self.button_cancel, proportion = 0, flag = wx.ALL, border = 5)
         
         self.sizer.Add(self.buttonSizer)
 
@@ -235,6 +270,12 @@ class Settings(wx.Dialog):
 
     def onOk(self, e):
         self.EndModal(wx.ID_OK)
+
+    def onRadioButton(self, e):
+        if e.Id == 3:
+            self.inputTxtOne.Enable(True); self.inputTxtTwo.Enable(True); self.inputTxtThree.Enable(True);
+        else:
+            self.inputTxtOne.Enable(False); self.inputTxtTwo.Enable(False); self.inputTxtThree.Enable(False);    
 
     def GetSettings(self):
         i=0
