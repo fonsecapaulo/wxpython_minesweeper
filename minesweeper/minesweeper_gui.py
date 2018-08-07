@@ -255,15 +255,17 @@ class Settings(wx.Dialog):
             self.radioButtons.append(rb)
         
         self.Bind(wx.EVT_RADIOBUTTON, self.onRadioButton)
+        
+        self.pointer = pointer
             
-        self.radioButtons[pointer].SetValue(True)
+        self.radioButtons[self.pointer].SetValue(True)
         
          
-        if pointer == 3:
+        if self.pointer == 3:
             self.inputRows.Enable(True); self.inputColumns.Enable(True); self.inputMines.Enable(True);
-            self.inputRows.SetValue(str(settings[pointer]['numberRows']))
-            self.inputColumns.SetValue(str(settings[pointer]['numberColumns']))
-            self.inputMines.SetValue(str(settings[pointer]['numberMines']))
+            self.inputRows.SetValue(str(settings[self.pointer]['numberRows']))
+            self.inputColumns.SetValue(str(settings[self.pointer]['numberColumns']))
+            self.inputMines.SetValue(str(settings[self.pointer]['numberMines']))
         
         self.buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
         
@@ -283,17 +285,28 @@ class Settings(wx.Dialog):
         self.EndModal(wx.ID_CANCEL)
 
     def onOk(self, e):
+        #Custom entry
+        if self.pointer == 3:
+            #Validate user input
+            try:
+                assert (int(self.inputRows.GetValue()) * int(self.inputColumns.GetValue())) > (int(self.inputMines.GetValue()) - 4)
+            except ValueError:
+                wx.MessageBox("Please insert only numbers in the fields!", "Error", wx.ICON_ERROR)
+                return                
+            except AssertionError:     
+                wx.MessageBox("Number of mines is too big for the board!", "Error", wx.ICON_ERROR)
+                return            
+        
         self.EndModal(wx.ID_OK)
 
     def onRadioButton(self, e):
         if e.Id == 3:
-            #TODO: Validate user input.
-            #Set min max row / columns
-            #Set min max number of mines according to size
             self.inputRows.Enable(True); self.inputColumns.Enable(True); self.inputMines.Enable(True);
         else:
             self.inputRows.Enable(False); self.inputColumns.Enable(False); self.inputMines.Enable(False);    
-
+        
+        self.pointer = e.Id
+        
     def GetSettings(self):
         i=0
         for rButton in self.radioButtons:
