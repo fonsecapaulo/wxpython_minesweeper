@@ -4,7 +4,7 @@ Created on 21 Jul 2018
 @author: Paulo
 '''
 import wx 
-from minesweeper_logic import MinesweeperLogic
+from minesweeper.minesweeper_logic import MinesweeperLogic
 
 class MinesweeperGui(wx.Frame):
     
@@ -87,7 +87,7 @@ class MinesweeperGui(wx.Frame):
                                0)
         for i in range(0, self.gameSettings[self.gameSettingsPointer]['numberRows']*self.gameSettings[self.gameSettingsPointer]['numberColumns']): 
             bmpButton = wx.BitmapButton(self.panel, id = i, bitmap = self.bmpTilePlain, )
-            #Bind left Right
+            #Bind Right Click
             bmpButton.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
             self.buttons.append(bmpButton)
             self.gs.Add(bmpButton, 0, wx.EXPAND)
@@ -186,7 +186,7 @@ class MinesweeperGui(wx.Frame):
             self.gs.Add(bmpButton, 0, wx.EXPAND)
         
         self.SetSize((self.gameSettings[self.gameSettingsPointer]['numberColumns'] * self.TILE_SIZE , 
-                      self.gameSettings[self.gameSettingsPointer]['numberRows'] * self.TILE_SIZE ))
+                      self.gameSettings[self.gameSettingsPointer]['numberRows'] * self.TILE_SIZE + self.MENU_HEIGHT))
         
         self.panel.SetSizer(self.gs)
         self.panel.Layout()
@@ -258,7 +258,7 @@ class Settings(wx.Dialog):
             
         self.radioButtons[pointer].SetValue(True)
         
-        # TODO: pass the settings 
+         
         if pointer == 3:
             self.inputRows.Enable(True); self.inputColumns.Enable(True); self.inputMines.Enable(True);
             self.inputRows.SetValue(str(settings[pointer]['numberRows']))
@@ -287,6 +287,9 @@ class Settings(wx.Dialog):
 
     def onRadioButton(self, e):
         if e.Id == 3:
+            #TODO: Validate user input.
+            #Set min max row / columns
+            #Set min max number of mines according to size
             self.inputRows.Enable(True); self.inputColumns.Enable(True); self.inputMines.Enable(True);
         else:
             self.inputRows.Enable(False); self.inputColumns.Enable(False); self.inputMines.Enable(False);    
