@@ -5,6 +5,8 @@ Created on 21 Jul 2018
 '''
 import wx 
 from minesweeper.minesweeper_logic import MinesweeperLogic
+import os
+
 
 class MinesweeperGui(wx.Frame):
     
@@ -14,20 +16,20 @@ class MinesweeperGui(wx.Frame):
                 
         self.title=title
         
-        self.bmpTilePlain = wx.Bitmap("./images/tile_plain.gif")
-        self.bmpTileFlag = wx.Bitmap("./images/tile_flag.gif")
-        self.bmpTileClicked = wx.Bitmap("./images/tile_clicked.gif")
-        self.bmpTileMine = wx.Bitmap("./images/tile_mine.gif")
-        self.bmpTileWrong = wx.Bitmap("./images/tile_wrong.gif")
-        self.bmpNumbers = [wx.Bitmap("./images/tile_clicked.gif"),
-                            wx.Bitmap("./images/tile_1.gif"),
-                            wx.Bitmap("./images/tile_2.gif"),
-                            wx.Bitmap("./images/tile_3.gif"),
-                            wx.Bitmap("./images/tile_4.gif"),
-                            wx.Bitmap("./images/tile_5.gif"),
-                            wx.Bitmap("./images/tile_6.gif"),
-                            wx.Bitmap("./images/tile_7.gif"),
-                            wx.Bitmap("./images/tile_8.gif")]
+        self.bmpTilePlain = wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_plain.gif")
+        self.bmpTileFlag = wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_flag.gif")
+        self.bmpTileClicked = wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_clicked.gif")
+        self.bmpTileMine = wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_mine.gif")
+        self.bmpTileWrong = wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_wrong.gif")
+        self.bmpNumbers = [wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_clicked.gif"),
+                            wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_1.gif"),
+                            wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_2.gif"),
+                            wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_3.gif"),
+                            wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_4.gif"),
+                            wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_5.gif"),
+                            wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_6.gif"),
+                            wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_7.gif"),
+                            wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/tile_8.gif")]
         
         self.TILE_SIZE = 28
         self.MENU_HEIGHT = 60
@@ -56,7 +58,7 @@ class MinesweeperGui(wx.Frame):
         self.Centre()
                 
         icon = wx.Icon()
-        icon.CopyFromBitmap(wx.Bitmap(".\images\icon.png", wx.BITMAP_TYPE_ANY))
+        icon.CopyFromBitmap(wx.Bitmap(os.path.dirname(os.path.abspath( __file__ ))+"/images/icon.png", wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
         
         #####################################
